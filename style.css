@@ -1,0 +1,470 @@
+/* ============================================================
+   LowAtmos — style.css
+   Dark atmospheric theme | Bebas Neue + DM Mono
+   ============================================================ */
+
+/* ── CSS Variables ── */
+:root {
+  --bg-base:        #060d18;       /* deep midnight navy */
+  --bg-card:        #0c1827;       /* slightly lighter card surface */
+  --bg-card-border: #162235;       /* card border */
+  --accent:         #00e5ff;       /* electric cyan */
+  --accent-dim:     #00b8cc;       /* dimmer cyan for hover */
+  --accent-glow:    rgba(0, 229, 255, 0.15);
+  --text-primary:   #e8f4f8;       /* near-white with a cool tint */
+  --text-secondary: #6a8fa8;       /* muted blue-grey */
+  --text-label:     #3d6070;       /* very dim label colour */
+  --danger:         #ff4e6a;       /* error red */
+  --danger-bg:      rgba(255, 78, 106, 0.08);
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+
+  --radius-card: 20px;
+  --radius-input: 12px;
+  --transition: 0.25s ease;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem 4rem;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── Background Atmospheric Layers ── */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle noise texture using repeating SVG */
+.bg-noise {
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* Radial cyan glow centred top */
+.bg-glow {
+  background: radial-gradient(
+    ellipse 60% 40% at 50% 0%,
+    rgba(0, 180, 220, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+/* ── Main Container ── */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* ── Brand Header ── */
+.brand {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 1rem;
+}
+
+.brand-icon {
+  font-size: 2.2rem;
+  color: var(--accent);
+  animation: pulse-icon 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes pulse-icon {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.6; transform: scale(0.92); }
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 5rem);
+  letter-spacing: 0.18em;
+  color: var(--text-primary);
+  line-height: 1;
+  /* subtle cyan text glow */
+  text-shadow: 0 0 40px rgba(0, 229, 255, 0.2);
+}
+
+.brand-tagline {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+
+/* ── Search Section ── */
+.search-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Input wrapper with icon */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+  color: var(--text-label);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.city-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 2.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.city-input::placeholder {
+  color: var(--text-label);
+}
+
+.city-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Fetch Button */
+.fetch-btn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-input);
+  color: var(--bg-base);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 4px 24px rgba(0, 229, 255, 0.2);
+}
+
+.fetch-btn:hover {
+  background: var(--accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 229, 255, 0.3);
+}
+
+.fetch-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn-arrow {
+  font-size: 1rem;
+  transition: transform var(--transition);
+}
+
+.fetch-btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Loader ── */
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 0;
+  width: 100%;
+}
+
+.loader-ring {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--bg-card-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-text {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ── Error Box ── */
+.error-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--danger-bg);
+  border: 1px solid rgba(255, 78, 106, 0.25);
+  border-radius: var(--radius-input);
+  animation: slide-in 0.3s ease;
+}
+
+.error-icon {
+  font-size: 1.1rem;
+  color: var(--danger);
+  flex-shrink: 0;
+}
+
+.error-msg {
+  font-size: 0.82rem;
+  color: var(--danger);
+  letter-spacing: 0.03em;
+}
+
+/* ── Weather Card ── */
+.weather-card {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: slide-in 0.4s ease;
+  /* inner glow from top */
+  box-shadow:
+    0 0 0 1px rgba(0,229,255,0.04),
+    0 20px 60px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Card Top Row */
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.card-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--text-label);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.city-name {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 2.8rem);
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  line-height: 1.05;
+}
+
+.country-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  letter-spacing: 0.08em;
+}
+
+/* Weather emoji / icon badge */
+.condition-badge {
+  background: rgba(0,229,255,0.06);
+  border: 1px solid rgba(0,229,255,0.1);
+  border-radius: 14px;
+  padding: 0.6rem 0.9rem;
+  flex-shrink: 0;
+}
+
+.weather-emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+  display: block;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bg-card-border) 30%, var(--bg-card-border) 70%, transparent);
+}
+
+/* Stats Grid */
+.card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stat-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stat-label {
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  color: var(--text-label);
+  text-transform: uppercase;
+}
+
+/* Temperature */
+.stat-temp .stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
+.temp-value {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 12vw, 5rem);
+  color: var(--accent);
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(0, 229, 255, 0.35);
+}
+
+.temp-unit {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+/* Condition */
+.condition-value {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+/* Sub-text (feels like, description) */
+.stat-sub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+
+/* Extra stats: Humidity + Wind */
+.stat-extra {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--bg-card-border);
+}
+
+.extra-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.extra-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+}
+
+/* Card Footer */
+.card-footer {
+  border-top: 1px solid var(--bg-card-border);
+  padding-top: 1rem;
+}
+
+.fetch-time {
+  font-size: 0.62rem;
+  color: var(--text-label);
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+/* ── Utility: Hidden ── */
+.hidden {
+  display: none !important;
+}
+
+/* ── Responsive — Mobile ── */
+@media (max-width: 480px) {
+  body {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .container {
+    gap: 1.5rem;
+  }
+
+  .weather-card {
+    padding: 1.5rem;
+  }
+
+  .stat-extra {
+    padding: 0.85rem 1rem;
+  }
+
+  .fetch-btn {
+    font-size: 1rem;
+    padding: 0.85rem 1.25rem;
+  }
+}

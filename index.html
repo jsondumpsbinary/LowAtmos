@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LowAtmos — Weather</title>
+
+  <!-- Google Fonts: Bebas Neue (display) + DM Mono (body/data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Atmospheric background layers -->
+  <div class="bg-layer bg-noise"></div>
+  <div class="bg-layer bg-glow"></div>
+
+  <main class="container">
+
+    <!-- ── Brand Header ── -->
+    <header class="brand">
+      <span class="brand-icon">◎</span>
+      <h1 class="brand-name">LowAtmos</h1>
+      <p class="brand-tagline">real-time atmospheric pressure on your city</p>
+    </header>
+
+    <!-- ── Search Form ── -->
+    <section class="search-section">
+      <div class="input-wrapper">
+        <span class="input-icon">⌕</span>
+        <input
+          type="text"
+          id="cityInput"
+          class="city-input"
+          placeholder="Enter city name…"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="City name"
+        />
+      </div>
+      <button id="fetchBtn" class="fetch-btn" aria-label="Get weather">
+        <span class="btn-label">Get Weather</span>
+        <span class="btn-arrow">→</span>
+      </button>
+    </section>
+
+    <!-- ── Loading Indicator (hidden by default) ── -->
+    <div id="loader" class="loader hidden" aria-live="polite" aria-label="Loading weather data">
+      <div class="loader-ring"></div>
+      <span class="loader-text">Scanning atmosphere…</span>
+    </div>
+
+    <!-- ── Error Message (hidden by default) ── -->
+    <div id="errorBox" class="error-box hidden" role="alert">
+      <span class="error-icon">⚠</span>
+      <span id="errorMsg" class="error-msg"></span>
+    </div>
+
+    <!-- ── Weather Result Card (hidden by default) ── -->
+    <article id="weatherCard" class="weather-card hidden" aria-live="polite">
+        <div id="songsContainer"></div>
+
+      <div class="card-top">
+        <div class="city-meta">
+          <p class="card-label">Location</p>
+          <h2 id="cityName" class="city-name"></h2>
+          <p id="countryName" class="country-name"></p>
+        </div>
+        <div class="condition-badge">
+          <span id="weatherIcon" class="weather-emoji" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-stats">
+
+        <!-- Temperature -->
+        <div class="stat-block stat-temp">
+          <p class="stat-label">Temperature</p>
+          <p class="stat-value">
+            <span id="temperature" class="temp-value"></span>
+            <span class="temp-unit">°C</span>
+          </p>
+          <p id="feelsLike" class="stat-sub"></p>
+        </div>
+
+        <!-- Condition -->
+        <div class="stat-block stat-condition">
+          <p class="stat-label">Condition</p>
+          <p id="condition" class="condition-value"></p>
+          <p id="conditionDesc" class="stat-sub"></p>
+        </div>
+
+        <!-- Humidity + Wind row -->
+        <div class="stat-block stat-extra">
+          <div class="extra-item">
+            <p class="stat-label">Humidity</p>
+            <p id="humidity" class="extra-value"></p>
+          </div>
+          <div class="extra-item">
+            <p class="stat-label">Wind</p>
+            <p id="wind" class="extra-value"></p>
+          </div>
+        </div>
+
+      </div>
+
+      <footer class="card-footer">
+        <p id="fetchTime" class="fetch-time"></p>
+      </footer>
+
+    </article>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
