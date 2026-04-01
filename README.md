@@ -47,7 +47,6 @@ By analyzing weather data alongside mood input, the application dynamically cura
 
 ### Frontend
 
-* React.js (Vite)
 * JavaScript (ES6+)
 * CSS / Tailwind CSS (optional)
 
