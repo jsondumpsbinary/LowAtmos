@@ -124,33 +124,47 @@ async function predictGenre(mood, weatherData) {
     const weatherContext = `${weatherData.weather} - ${weatherData.description} (${Math.round(
         weatherData.temp
     )}°C)`;
-    const sequence = `Mood: ${mood}. Weather: ${weatherContext}. Suggest a music genre.`;
-
+    
     const payload = {
-        inputs: sequence,
-        parameters: {
-            candidate_labels: candidate_labels,
-        },
+        model: "meta-llama/Llama-3.2-1B-Instruct:novita",
+        messages: [
+            {
+                role: "user",
+                content: `Mood: ${mood}. Weather: ${weatherContext}. Suggest exactly one music genre from this list: ${candidate_labels.join(', ')}. Output only the genre name. No other text.`
+            }
+        ],
+        max_tokens: 10
     };
 
     try {
         const response = await fetch(
-            "https://api-inference.huggingface.co/models/facebook/bart-large-mnli",
+            "https://router.huggingface.co/v1/chat/completions",
             {
-                headers: { Authorization: `Bearer ${HF_TOKEN}` },
+                headers: { 
+                    Authorization: `Bearer ${HF_TOKEN}`, 
+                    "Content-Type": "application/json" 
+                },
                 method: "POST",
                 body: JSON.stringify(payload),
             }
         );
 
         if (!response.ok) {
-            throw new Error("Hugging Face API Error");
+            throw new Error("Hugging Face API Error: " + response.statusText);
         }
 
         const data = await response.json();
-        // The model returns scores for each label; get the highest scoring one
-        const topGenre = data.labels[0];
-        return topGenre;
+        
+        let predictedGenre = data.choices && data.choices[0] && data.choices[0].message.content 
+                             ? data.choices[0].message.content.trim() 
+                             : candidate_labels[0];
+                             
+        // Attempt to match the generated text to one of the candidate labels
+        const matchedGenre = candidate_labels.find(label => 
+            predictedGenre.toLowerCase().includes(label.toLowerCase())
+        );
+
+        return matchedGenre || candidate_labels[0];
     } catch (err) {
         throw new Error(`AI Genre Prediction Error: ${err.message}`);
     }
@@ -160,18 +174,15 @@ async function predictGenre(mood, weatherData) {
  * Fetch songs from Deezer API via allorigins proxy
  */
 async function fetchSongs(genre) {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(
-        `https://api.deezer.com/search?q=${encodeURIComponent(genre)}&limit=50`
-    )}`;
+    const apiUrl = `https://striveschool-api.herokuapp.com/api/deezer/search?q=${encodeURIComponent(genre)}&limit=50`;
 
     try {
-        const response = await fetch(proxyUrl);
+        const response = await fetch(apiUrl);
         if (!response.ok) {
             throw new Error("Deezer API request failed");
         }
 
-        const corsData = await response.json();
-        const data = JSON.parse(corsData.contents);
+        const data = await response.json();
 
         if (!data.data || data.data.length === 0) {
             throw new Error("No songs found for this genre");
