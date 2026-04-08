@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LowAtmos - Weather-Driven Music Discovery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <h1 class="title">LowAtmos</h1>
+            <h2 class="section-title">Find Your Vibe</h2>
+            <p class="subtitle">Tell us where you are and how you feel — we'll handle the rest.</p>
+        </header>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-group">
+                <label for="city-input" class="input-label">City</label>
+                <input 
+                    type="text" 
+                    id="city-input" 
+                    class="input-field" 
+                    placeholder="Enter a city name..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="mood-dropdown" class="input-label">Mood</label>
+                <select id="mood-dropdown" class="input-field mood-select">
+                    <option value="">Select a mood...</option>
+                    <option value="Happy">Happy</option>
+                    <option value="Calm">Calm</option>
+                    <option value="Energetic">Energetic</option>
+                    <option value="Melancholic">Melancholic</option>
+                    <option value="Focused">Focused</option>
+                </select>
+            </div>
+
+            <button id="search-btn" class="btn-search">Discover Music</button>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Finding the perfect playlist...</p>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section hidden">
+            <!-- Genre Display -->
+            <div class="genre-container">
+                <p class="genre-label">AI-Suggested Genre</p>
+                <h2 id="genre-display" class="genre-heading">—</h2>
+            </div>
+
+            <!-- Song Cards Grid -->
+            <div id="songs-grid" class="songs-grid">
+                <!-- Cards will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Error Section -->
+        <div id="error-section" class="error-section hidden">
+            <p id="error-message" class="error-text"></p>
+            <button class="btn-retry" onclick="location.reload()">Try Again</button>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
