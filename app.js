@@ -4,8 +4,8 @@
 
 // ⚠️  SECURITY WARNING: Keep API keys empty when pushing to GitHub!
 // Add your keys locally for development only.
-const HF_TOKEN = "PASTE_YOUR_TOKEN_HERE";
-const WEATHER_KEY = "PASTE_YOUR_KEY_HERE";
+const HF_TOKEN = "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";
+const WEATHER_KEY = "753e6fb30a4bd59c20f227cfe7cd5c31";
 
 // ⚠️  Add these keys locally:
 // 1. HF_TOKEN: Get from https://huggingface.co/settings/tokens
