@@ -54,6 +54,25 @@ python -m http.server 8000
 # Visit http://localhost:8000
 ```
 
+### 4. Deploy to Vercel
+
+Before deploying, update `config.js` with your Hugging Face token:
+```javascript
+const CONFIG = {
+  HF_TOKEN: "hf_your_actual_token_here",
+};
+```
+
+Then:
+1. Push to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Import your GitHub repo
+4. Deploy!
+
+The `config.js` file is now tracked in Git, so your token will be available on Vercel.
+
+⚠️ **Security Note:** Don't share your token publicly. If you do, go to Hugging Face and revoke it immediately.
+
 ## 📝 How It Works
 
 ### Data Flow
