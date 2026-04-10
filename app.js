@@ -2,8 +2,11 @@
    LowAtmos - Main Application
    ======================================== */
 
-// Import configuration from config.js
-const { HF_TOKEN } = CONFIG;
+// Configuration - from config.js (local) or environment variables (deployed)
+const HF_TOKEN = 
+  (typeof CONFIG !== "undefined" && CONFIG.HF_TOKEN) || 
+  (typeof process !== "undefined" && process.env.REACT_APP_HF_TOKEN) ||
+  "";
 
 /* ========================================
    DOM Elements
@@ -41,8 +44,8 @@ async function handleSearch() {
         return;
     }
 
-    if (HF_TOKEN === "PASTE_YOUR_HF_TOKEN_HERE") {
-        showError("⚠️  API keys are not configured. Please add them to config.js first.");
+    if (!HF_TOKEN || HF_TOKEN === "PASTE_YOUR_HF_TOKEN_HERE") {
+        showError("⚠️  Hugging Face API key not configured. Set REACT_APP_HF_TOKEN environment variable on Vercel or add to config.js locally.");
         return;
     }
 
