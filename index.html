@@ -70,7 +70,14 @@
         </div>
     </main>
 
-    <!-- Load config first (contains API keys) -->
+    <!-- Fallback config in case config.js doesn't load -->
+    <script>
+        window.CONFIG = window.CONFIG || {
+            HF_TOKEN: "PASTE_YOUR_HF_TOKEN_HERE"
+        };
+    </script>
+    
+    <!-- Load config first (try to load from file) -->
     <script src="config.js"></script>
     <!-- Then load main app -->
     <script src="app.js"></script>
