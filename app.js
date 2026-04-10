@@ -1,16 +1,9 @@
 /* ========================================
-   LowAtmos - App Configuration & Security
+   LowAtmos - Main Application
    ======================================== */
 
-// ⚠️  SECURITY WARNING: Keep API keys empty when pushing to GitHub!
-// Add your keys locally for development only.
-const HF_TOKEN = "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";
-const WEATHER_KEY = "753e6fb30a4bd59c20f227cfe7cd5c31";
-
-// ⚠️  Add these keys locally:
-// 1. HF_TOKEN: Get from https://huggingface.co/settings/tokens
-// 2. WEATHER_KEY: Get from https://openweathermap.org/api
-// 3. Deezer API: No key required (uses allorigins proxy)
+// Import configuration from config.js
+const { HF_TOKEN } = CONFIG;
 
 /* ========================================
    DOM Elements
@@ -48,8 +41,8 @@ async function handleSearch() {
         return;
     }
 
-    if (HF_TOKEN === "PASTE_YOUR_TOKEN_HERE" || WEATHER_KEY === "PASTE_YOUR_KEY_HERE") {
-        showError("⚠️  API keys are not configured. Please add them to app.js first.");
+    if (HF_TOKEN === "PASTE_YOUR_HF_TOKEN_HERE") {
+        showError("⚠️  API keys are not configured. Please add them to config.js first.");
         return;
     }
 
@@ -80,23 +73,78 @@ async function handleSearch() {
    ======================================== */
 
 /**
- * Fetch weather data from OpenWeather API
+ * Fetch weather data from Open-Meteo API (no API key required!)
  */
 async function fetchWeather(city) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
-        city
-    )}&appid=${WEATHER_KEY}&units=metric`;
-
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
+        // Step 1: Get city coordinates using Geocoding API
+        const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+        
+        const geoResponse = await fetch(geocodingUrl);
+        const geoData = await geoResponse.json();
+        
+        if (!geoData.results || geoData.results.length === 0) {
             throw new Error(`City not found: ${city}`);
         }
-        const data = await response.json();
+        
+        const { latitude, longitude, name, country } = geoData.results[0];
+        
+        // Step 2: Get weather data using coordinates
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,relative_humidity_2m&temperature_unit=celsius`;
+        
+        const weatherResponse = await fetch(weatherUrl);
+        const weatherData = await weatherResponse.json();
+        
+        if (!weatherData.current) {
+            throw new Error("Failed to fetch weather data");
+        }
+        
+        const current = weatherData.current;
+        
+        // Map weather codes to descriptions
+        const weatherDescriptions = {
+            0: "Clear sky",
+            1: "Mostly clear",
+            2: "Partly cloudy",
+            3: "Overcast",
+            45: "Foggy",
+            48: "Foggy",
+            51: "Light drizzle",
+            53: "Moderate drizzle",
+            55: "Dense drizzle",
+            61: "Slight rain",
+            63: "Moderate rain",
+            65: "Heavy rain",
+            71: "Slight snow",
+            73: "Moderate snow",
+            75: "Heavy snow",
+            80: "Slight rain showers",
+            81: "Moderate rain showers",
+            82: "Violent rain showers",
+            85: "Slight snow showers",
+            86: "Heavy snow showers",
+            95: "Thunderstorm",
+            96: "Thunderstorm with slight hail",
+            99: "Thunderstorm with heavy hail",
+        };
+        
+        const weatherDescription = weatherDescriptions[current.weather_code] || "Unknown";
+        
+        // Determine main weather type
+        let weatherMain = "Clear";
+        if (current.weather_code >= 51 && current.weather_code <= 67) weatherMain = "Rain";
+        else if (current.weather_code >= 71 && current.weather_code <= 86) weatherMain = "Snow";
+        else if (current.weather_code >= 80 && current.weather_code <= 82) weatherMain = "Rain";
+        else if (current.weather_code >= 95) weatherMain = "Thunderstorm";
+        else if (current.weather_code >= 45) weatherMain = "Clouds";
+        else if (current.weather_code >= 2) weatherMain = "Clouds";
+        
         return {
-            temp: data.main.temp,
-            weather: data.weather[0].main,
-            description: data.weather[0].description,
+            temp: current.temperature_2m,
+            weather: weatherMain,
+            description: weatherDescription,
+            city: name,
+            country: country,
         };
     } catch (err) {
         throw new Error(`Weather API Error: ${err.message}`);
@@ -126,7 +174,7 @@ async function predictGenre(mood, weatherData) {
     )}°C)`;
     
     const payload = {
-        model: "meta-llama/Llama-3.2-1B-Instruct:novita",
+        model: "meta-llama/Llama-3.2-1B-Instruct",
         messages: [
             {
                 role: "user",
@@ -150,7 +198,9 @@ async function predictGenre(mood, weatherData) {
         );
 
         if (!response.ok) {
-            throw new Error("Hugging Face API Error: " + response.statusText);
+            const errorData = await response.json().catch(() => ({}));
+            const errorMsg = errorData.error?.message || response.statusText || `HTTP ${response.status}`;
+            throw new Error(`Hugging Face API Error (${response.status}): ${errorMsg}`);
         }
 
         const data = await response.json();
@@ -171,45 +221,34 @@ async function predictGenre(mood, weatherData) {
 }
 
 /**
- * Fetch songs from Deezer API via allorigins proxy
+ * Fetch songs from iTunes Search API
  */
 async function fetchSongs(genre) {
-    const apiUrl = `https://striveschool-api.herokuapp.com/api/deezer/search?q=${encodeURIComponent(genre)}&limit=50`;
+    const apiUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(genre)}&media=music&limit=50`;
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error("Deezer API request failed");
-        }
-
-        const data = await response.json();
-
-        if (!data.data || data.data.length === 0) {
-            throw new Error("No songs found for this genre");
-        }
-
-        // Use higher-order functions to filter and sort songs
-        const processedSongs = data.data
-            .filter((song) => song.preview && song.preview.length > 0) // Only songs with previews
-            .filter((song) => song.album && song.album.cover) // Only songs with album art
-            .sort((a, b) => b.rank - a.rank) // Sort by popularity (rank)
-            .slice(0, 10) // Get top 10
-            .map((song) => ({
-                title: song.title,
-                artist: song.artist.name,
-                preview: song.preview,
-                cover: song.album.cover,
-                id: song.id,
-            }));
-
-        if (processedSongs.length === 0) {
-            throw new Error("No songs with previews available for this genre");
-        }
-
-        return processedSongs;
-    } catch (err) {
-        throw new Error(`Music API Error: ${err.message}`);
+    if (!data.results || data.results.length === 0) {
+        throw new Error("No songs found for this genre");
     }
+
+    const processedSongs = data.results
+        .filter((song) => song.previewUrl) // Only songs with preview
+        .filter((song) => song.artworkUrl100) // Only songs with artwork
+        .slice(0, 10) // Get top 10
+        .map((song) => ({
+            title: song.trackName,
+            artist: song.artistName,
+            preview: song.previewUrl,
+            cover: song.artworkUrl100,
+            id: song.trackId,
+        }));
+
+    if (processedSongs.length === 0) {
+        throw new Error("No songs with previews available");
+    }
+
+    return processedSongs;
 }
 
 /* ========================================

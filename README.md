@@ -1,35 +1,28 @@
 # LowAtmos 🎵
 
-**A sophisticated dark mode web application that discovers music based on weather and mood.**
+**A simple dark mode web application that discovers music based on weather and mood.**
 
 ## 📋 Project Overview
 
-LowAtmos is a professional-grade vanilla JavaScript web application that combines real-time weather data, AI-powered genre prediction, and music discovery. Built with strict requirements for vanilla JS, HTML5, and CSS3 to demonstrate pure DOM manipulation and API integration skills.
-
-### Purpose
-Connect environmental conditions (weather) and emotional state (mood) to personalized music recommendations using multiple APIs and machine learning models.
+LowAtmos is a vanilla JavaScript web app that combines real-time weather data, AI-powered genre prediction, and music discovery. Built with vanilla JS, HTML5, and CSS3—no frameworks, no dependencies.
 
 ## 🛠 Tech Stack
 
 - **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3
 - **APIs:**
-  - **OpenWeatherMap API** - Real-time weather data
-  - **Hugging Face API** - Zero-shot classification for genre prediction (Model: `facebook/bart-large-mnli`)
-  - **Deezer API** - Music catalog and track information (via `allorigins` proxy for CORS)
-- **Architecture:** Async/Await, Higher-Order Functions (.map(), .filter(), .sort())
+  - **Open-Meteo API** - Real-time weather (free, no API key needed)
+  - **Hugging Face API** - Genre prediction using AI
+  - **iTunes Search API** - Music discovery (free, no API key needed)
 
 ## 🎨 Design
 
 **Color Palette:** Midnight Slate Theme
-- Primary Background: `#121212`
-- Secondary Background: `#1a202c`
-- Card Background: `#2d3748`
-- Accent: Dusty Teal (`#5a8a94`) & Slate Blue (`#6b7183`)
+- Background: `#121212`
+- Cards: `#2d3748`
+- Accent: Teal (`#5a8a94`)
 - Text: Off-white (`#e2e8f0`)
 
-**Typography:** System-ui sans-serif font for optimal readability
-
-**No Frameworks:** Pure DOM manipulation—zero dependencies, no React or libraries.
+**Features:** Fully responsive, dark mode only, minimal animations
 
 ## 🚀 Getting Started
 
@@ -37,46 +30,28 @@ Connect environmental conditions (weather) and emotional state (mood) to persona
 ```bash
 git clone <repository-url>
 cd lowatmos
-```
-
-### 2. Obtain API Keys
-
-**OpenWeather API Key:**
-1. Visit [openweathermap.org/api](https://openweathermap.org/api)
-2. Sign up for a free account
-3. Copy your API key from the dashboard
-
-**Hugging Face API Token:**
-1. Visit [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-2. Create a new access token (read access is sufficient)
-3. Copy your token
-
-**Deezer API:**
-- No authentication required (uses `allorigins` proxy)
-
-### 3. Configure Keys Locally
-
-Open `app.js` and add your keys:
-```javascript
-const HF_TOKEN = "your_huggingface_token_here";
-const WEATHER_KEY = "your_openweather_key_here";
-```
-
-⚠️ **Security:** Keep the keys as `"PASTE_YOUR_TOKEN_HERE"` and `"PASTE_YOUR_KEY_HERE"` when committing to GitHub to protect your accounts.
-
-### 4. Run the Application
-
-Simply open `index.html` in your web browser:
-```bash
-# macOS
 open index.html
+```
 
-# Linux
-xdg-open index.html
+### 2. Configure API Key
 
-# Or use any local server:
+Get your **Hugging Face token** (required):
+1. Visit [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+2. Create a new access token
+3. Open `config.js` and paste it:
+```javascript
+const CONFIG = {
+  HF_TOKEN: "your_token_here",
+};
+```
+
+**Note:** Weather and Music APIs are **free with no keys needed**!
+
+### 3. Run
+Simply open `index.html` in your browser or use a local server:
+```bash
 python -m http.server 8000
-# Then visit http://localhost:8000
+# Visit http://localhost:8000
 ```
 
 ## 📝 How It Works
@@ -85,19 +60,76 @@ python -m http.server 8000
 ```
 User Input (City + Mood)
     ↓
-OpenWeather API (fetch weather conditions)
+Open-Meteo API (fetch weather)
     ↓
-Hugging Face AI (predict genre from mood + weather)
+Hugging Face AI (predict genre)
     ↓
-Deezer API (find 10 songs of predicted genre)
+iTunes Search API (find songs)
     ↓
-Display results with playable previews
+Display with playable previews
 ```
 
-### Core Features
+## 📁 Project Structure
 
-**Input Section**
-- City input field for weather lookup
+```
+lowatmos/
+├── index.html       # Main UI
+├── app.js          # All logic (weather, AI, music, UI)
+├── style.css       # Styling
+├── config.js       # API configuration (not committed)
+└── README.md       # This file
+```
+
+## 🎵 Features
+
+- **Weather Integration** - Real-time conditions for your city
+- **AI Genre Prediction** - Mood + weather → perfect genre
+- **iTunes Music Search** - 10 song previews with album art
+- **Playable Previews** - Listen before liking
+- **Mobile Responsive** - Works on all devices
+- **No Dependencies** - Pure vanilla JavaScript
+
+## 🔧 API Details
+
+### Open-Meteo Weather
+- Free, no authentication
+- Returns: Temperature, weather type, description
+- Endpoints: Geocoding + Current weather
+
+### Hugging Face AI
+- Uses Llama-3.2 model for genre prediction
+- Credentials: Bearer token in `config.js`
+- Input: Mood + weather description
+- Output: Music genre
+
+### iTunes Search
+- Free, no authentication
+- Returns: Track info, artist, preview URL, artwork
+- Used for music discovery by genre
+
+## 📝 Code Structure
+
+**app.js** is organized into sections:
+1. **Configuration** - Import API keys
+2. **DOM Elements** - All HTML references
+3. **Event Listeners** - User interactions
+4. **Main Handler** - Orchestrates everything
+5. **API Functions** - Weather, AI, Music
+6. **Display Functions** - Render results
+7. **UI Helpers** - Loading, errors, etc.
+
+## 🐛 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "API keys not configured" | Add HF_TOKEN to `config.js` |
+| No songs found | Try a different city or mood |
+| Slow performance | Check your internet connection |
+| Preview not playing | Some songs may not have previews |
+
+## 📄 License
+
+Open source. Feel free to use and modify!
 - Mood dropdown (Happy, Calm, Energetic, Melancholic, Focused)
 - "Discover Music" button to trigger the search
 
