@@ -2,8 +2,8 @@
    LowAtmos - Main Application
    ======================================== */
 
-// Import configuration from config.js
-const { HF_TOKEN } = CONFIG;
+// App doesn't store API keys in the frontend anymore.
+// We use a Vercel serverless function (/api/predict) to handle secrets securely.
 
 /* ========================================
    DOM Elements
@@ -38,11 +38,6 @@ async function handleSearch() {
 
     if (!city || !mood) {
         showError("Please enter a city and select a mood.");
-        return;
-    }
-
-    if (!HF_TOKEN || HF_TOKEN === "PASTE_YOUR_HF_TOKEN_HERE") {
-        showError("⚠️  API key not configured. Add your Hugging Face token to config.js");
         return;
     }
 
@@ -185,22 +180,18 @@ async function predictGenre(mood, weatherData) {
     };
 
     try {
-        const response = await fetch(
-            "https://router.huggingface.co/v1/chat/completions",
-            {
-                headers: { 
-                    Authorization: `Bearer ${HF_TOKEN}`, 
-                    "Content-Type": "application/json" 
-                },
-                method: "POST",
-                body: JSON.stringify(payload),
-            }
-        );
+        const response = await fetch("/api/predict", {
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            method: "POST",
+            body: JSON.stringify(payload),
+        });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            const errorMsg = errorData.error?.message || response.statusText || `HTTP ${response.status}`;
-            throw new Error(`Hugging Face API Error (${response.status}): ${errorMsg}`);
+            const errorMsg = errorData.error || response.statusText || `HTTP ${response.status}`;
+            throw new Error(`Proxy API Error: ${errorMsg}`);
         }
 
         const data = await response.json();
